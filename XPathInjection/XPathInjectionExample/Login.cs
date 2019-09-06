@@ -31,5 +31,13 @@ namespace XPathInjectionExample
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private void chkMostrarSenha_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkMostrarSenha.Checked)
+                txtPassword.PasswordChar = (char)0;
+            else
+                txtPassword.PasswordChar = '*';
+        }
     }
 }

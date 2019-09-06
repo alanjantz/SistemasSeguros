@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Users>
+   <User ID="1">
+      <FirstName>Arnold</FirstName>
+      <LastName>Baker</LastName>
+      <UserName>ABaker</UserName>
+      <Password>123</Password>
+      <Type>Admin</Type>
+   </User>
+   <User ID="2">
+      <FirstName>Peter</FirstName>
+      <LastName>Pan</LastName>
+      <UserName>PPan</UserName>
+      <Password>NotTelling</Password>
+      <Type>User</Type>
+   </User>
+</Users>

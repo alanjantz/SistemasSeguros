@@ -33,9 +33,7 @@ namespace XPathCorrectExample
         /// <returns></returns>
         public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] ArgTypes)
         {
-            string strCase = name;
-
-            switch (strCase)
+            switch (name)
             {
                 case "ValidarUsuario":
                     return new XPathExtensionFunctions(2, 2, XPathResultType.Boolean, ArgTypes, "ValidarUsuario");

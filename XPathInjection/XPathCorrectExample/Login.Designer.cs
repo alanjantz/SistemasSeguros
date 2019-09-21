@@ -33,6 +33,7 @@
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.lblPassword = new System.Windows.Forms.Label();
             this.btnLogin = new System.Windows.Forms.Button();
+            this.chkMostrarSenha = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lblLogin
@@ -70,7 +71,7 @@
             // 
             // btnLogin
             // 
-            this.btnLogin.Location = new System.Drawing.Point(104, 113);
+            this.btnLogin.Location = new System.Drawing.Point(104, 127);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(75, 23);
             this.btnLogin.TabIndex = 4;
@@ -78,18 +79,30 @@
             this.btnLogin.UseVisualStyleBackColor = true;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
+            // chkMostrarSenha
+            // 
+            this.chkMostrarSenha.AutoSize = true;
+            this.chkMostrarSenha.Location = new System.Drawing.Point(13, 104);
+            this.chkMostrarSenha.Name = "chkMostrarSenha";
+            this.chkMostrarSenha.Size = new System.Drawing.Size(95, 17);
+            this.chkMostrarSenha.TabIndex = 5;
+            this.chkMostrarSenha.Text = "Mostrar Senha";
+            this.chkMostrarSenha.UseVisualStyleBackColor = true;
+            this.chkMostrarSenha.CheckedChanged += new System.EventHandler(this.chkMostrarSenha_CheckedChanged);
+            // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Controls.Add(this.chkMostrarSenha);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.lblPassword);
             this.Controls.Add(this.txtLogin);
             this.Controls.Add(this.lblLogin);
             this.Name = "Login";
-            this.Text = "Questão 02 - Login";
+            this.Text = "Example - Login";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -102,5 +115,6 @@
         private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.Button btnLogin;
+        private System.Windows.Forms.CheckBox chkMostrarSenha;
     }
 }

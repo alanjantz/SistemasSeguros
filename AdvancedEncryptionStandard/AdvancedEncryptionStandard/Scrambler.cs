@@ -1,16 +1,15 @@
 ﻿using AdvancedEncryptionStandard.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AdvancedEncryptionStandard
 {
     public class Scrambler : IDisposable, ICipher
     {
         private byte[] OriginalValue { get; set; }
+        private string EncryptedValue { get; set; }
         private string Key { get; set; }
         private int KeySize { get; set; }
         private byte[] InitializationVector { get; set; }
@@ -46,23 +45,75 @@ namespace AdvancedEncryptionStandard
             return this;
         }
 
-        public byte[] Encrypt()
+        public string Encrypt()
         {
-            ExpandirChave();
+            ExpandKey();
+            Round();
 
-            return null;
+            return EncryptedValue;
         }
 
-        private void ExpandirChave()
+        private void Round()
         {
-            InicializarMatrizEstado(this.Key, this.KeySize);
+            InitializeRound();
+
+            for (int round = 0; round < 10; round++)
+                DoRound();
+            
+            FinalizeRound();
         }
 
-        private void InicializarMatrizEstado(string key, int keySize)
+        private void InitializeRound()
         {
-            if (key.Length != keySize / 8)
-                throw new InvalidKeyException("A chave \"{0}\" não condiz com o tamanho especificado ({1}).", key, keySize);
+            AddRoundKey();
+        }
 
+        private void DoRound()
+        {
+            SubBytes();
+            ShiftRows();
+            MixClomuns();
+            AddRoundKey();
+        }
+
+        private void FinalizeRound()
+        {
+            SubBytes();
+            ShiftRows();
+            AddRoundKey();
+        }
+
+        private void AddRoundKey()
+        {
+
+        }
+
+        private void SubBytes()
+        {
+        
+        }
+
+        private void ShiftRows()
+        {
+        
+        }
+
+        private void MixClomuns()
+        {
+        
+        }
+
+        private void ExpandKey()
+        {
+            if (Key.Length != KeySize / 8)
+                throw new InvalidKeyException($"A chave \"{Key}\" não condiz com o tamanho especificado ({KeySize}).");
+
+            InitializeStateMatrix(Key);
+            WriteLog("Chave", StateMatrix);
+        }
+
+        private void InitializeStateMatrix(string key)
+        {
             for (int line = 0, index = 0; line < 4; line++)
                 for (int column = 0; column < 4; column++, index++)
                     StateMatrix[column, line] = key[index].ToHexByte();
@@ -76,6 +127,14 @@ namespace AdvancedEncryptionStandard
         public void Dispose()
         {
             OriginalValue = null;
+        }
+
+        public void WriteLog(string step, string[,] matrix)
+        {
+            Debug.WriteLine($"*** {step} ***");
+
+            for (int line = 0; line < 4; line++)
+                Debug.WriteLine($"{matrix[line, 0]} {matrix[line, 1]} {matrix[line, 2]} {matrix[line, 3]}");
         }
     }
 

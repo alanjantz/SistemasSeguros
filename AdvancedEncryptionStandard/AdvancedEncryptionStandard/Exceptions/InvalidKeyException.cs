@@ -8,11 +8,6 @@ namespace AdvancedEncryptionStandard.Exceptions
 {
     public class InvalidKeyException : Exception
     {
-        public InvalidKeyException(string message, params object[] args)
-        {
-            throw new InvalidKeyException(string.Format(message, args));
-        }
-
         public InvalidKeyException(string message) : base(message)
         {
         }

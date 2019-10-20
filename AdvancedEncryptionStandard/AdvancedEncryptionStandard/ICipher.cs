@@ -8,6 +8,6 @@ namespace AdvancedEncryptionStandard
 {
     public interface ICipher
     {
-        string Encrypt();
+        byte[] Encrypt();
     }
 }

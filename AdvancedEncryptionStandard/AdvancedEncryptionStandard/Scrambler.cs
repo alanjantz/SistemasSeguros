@@ -1,6 +1,5 @@
 ﻿using AdvancedEncryptionStandard.Exceptions;
 using System;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,13 +8,13 @@ namespace AdvancedEncryptionStandard
     public class Scrambler : IDisposable, ICipher
     {
         private byte[] OriginalValue { get; set; }
-        private string EncryptedValue { get; set; }
+        private byte[] EncryptedValue { get; set; }
         private string Key { get; set; }
         private int KeySize { get; set; }
         private byte[] InitializationVector { get; set; }
         private CipherMode OperationMode { get; set; }
         private PaddingMode Padding { get; set; }
-        private string[,] StateMatrix { get; set; }
+        private byte[,] StateMatrix { get; set; }
 
         public Scrambler(string originalValue) : this(Encoding.ASCII.GetBytes(originalValue))
         {
@@ -28,7 +27,7 @@ namespace AdvancedEncryptionStandard
             Padding = PaddingMode.PKCS7; // Mesmo algoritmo que PKCS#5
             KeySize = 128;
 
-            StateMatrix = new string[4, 4];
+            StateMatrix = new byte[4, 4];
         }
 
         public Scrambler WithKey(string key)
@@ -45,7 +44,7 @@ namespace AdvancedEncryptionStandard
             return this;
         }
 
-        public string Encrypt()
+        public byte[] Encrypt()
         {
             ExpandKey();
             Round();
@@ -57,50 +56,50 @@ namespace AdvancedEncryptionStandard
         {
             InitializeRound();
 
-            for (int round = 0; round < 10; round++)
-                DoRound();
-            
+            for (int round = 1; round < 10; round++)
+                DoRound(round);
+
             FinalizeRound();
         }
 
         private void InitializeRound()
         {
-            AddRoundKey();
+            AddRoundKey(0);
         }
 
-        private void DoRound()
+        private void DoRound(int round)
         {
             SubBytes();
             ShiftRows();
             MixClomuns();
-            AddRoundKey();
+            AddRoundKey(round);
         }
 
         private void FinalizeRound()
         {
             SubBytes();
             ShiftRows();
-            AddRoundKey();
+            AddRoundKey(10);
         }
 
-        private void AddRoundKey()
+        private void AddRoundKey(int round)
         {
 
         }
 
         private void SubBytes()
         {
-        
+
         }
 
         private void ShiftRows()
         {
-        
+
         }
 
         private void MixClomuns()
         {
-        
+
         }
 
         private void ExpandKey()
@@ -114,9 +113,9 @@ namespace AdvancedEncryptionStandard
 
         private void InitializeStateMatrix(string key)
         {
-            for (int line = 0, index = 0; line < 4; line++)
-                for (int column = 0; column < 4; column++, index++)
-                    StateMatrix[column, line] = key[index].ToHexByte();
+            for (int column = 0, index = 0; column < 4; column++)
+                for (int line = 0; line < 4; line++, index++)
+                    StateMatrix[line, column] = (byte)key[index];
         }
 
         ~Scrambler()
@@ -129,22 +128,22 @@ namespace AdvancedEncryptionStandard
             OriginalValue = null;
         }
 
-        public void WriteLog(string step, string[,] matrix)
+        public void WriteLog(string step, byte[,] matrix)
         {
-            Debug.WriteLine($"*** {step} ***");
+            Console.WriteLine($"*** {step} ***");
 
             for (int line = 0; line < 4; line++)
-                Debug.WriteLine($"{matrix[line, 0]} {matrix[line, 1]} {matrix[line, 2]} {matrix[line, 3]}");
+                Console.WriteLine($"{matrix[line, 0].ToHexByte()} {matrix[line, 1].ToHexByte()} {matrix[line, 2].ToHexByte()} {matrix[line, 3].ToHexByte()}");
         }
     }
 
     public static class Extentions
     {
-        public static string ToHexByte(this char value)
+        public static string ToHexByte(this byte value)
         {
             try
             {
-                return Convert.ToByte(value).ToString("x2");
+                return "0x" + value.ToString("x2");
             }
             catch (Exception)
             {

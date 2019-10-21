@@ -1,9 +1,5 @@
 ﻿using AdvancedEncryptionStandard;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleApp
 {
@@ -11,12 +7,10 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            using (var scrambler = new Scrambler("a"))
-            {
-                scrambler.WithKey("ABCDEFGHIJKLMNOP");
+            var scrambler = new Scrambler("a").WithKey("ABCDEFGHIJKLMNOP", 4);
 
-                scrambler.Encrypt();
-            }
+            scrambler.Encrypt();
+            Console.ReadLine();
         }
     }
 }

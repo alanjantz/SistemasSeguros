@@ -1,5 +1,6 @@
 ﻿using AdvancedEncryptionStandard.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -7,7 +8,19 @@ namespace AdvancedEncryptionStandard
 {
     public class Scrambler
     {
-        private byte[] OriginalValue { get; set; }
+        private byte[] OriginalValue 
+        { 
+            get
+            {
+                return SquareMatrixToArray(StateMatrixIn);
+            }
+            set
+            {
+                StateMatrixIn = new byte[value.Length / 4, 4];
+                InitializeMatrix(value, StateMatrixIn);
+                WriteLog("Texto simples", StateMatrixIn);
+            }
+        }
         private byte[] EncryptedValue { get; set; }
         private Key Key { get; set; }
         private byte[] InitializationVector { get; set; }
@@ -15,6 +28,9 @@ namespace AdvancedEncryptionStandard
         private PaddingMode Padding { get; set; }
         private byte[,] StateMatrix { get; set; }
         private byte[,] KeySchedule { get; set; }
+        private int Rounds { get; set; }
+        private byte[,] StateMatrixIn { get; set; }
+        private byte[,] StateMatrixOut { get; set; }
 
         public Scrambler(string originalValue) : this(Encoding.ASCII.GetBytes(originalValue))
         {
@@ -25,6 +41,7 @@ namespace AdvancedEncryptionStandard
             OriginalValue = originalValue;
             OperationMode = CipherMode.ECB;
             Padding = PaddingMode.PKCS7; // Mesmo algoritmo que PKCS#5
+            Rounds = 10;
         }
 
         public Scrambler WithKey(string key, int bytes)
@@ -55,29 +72,22 @@ namespace AdvancedEncryptionStandard
             if (Key.Value.Length != Key.Bits / 8)
                 throw new InvalidKeyException($"A chave \"{Key}\" não condiz com o tamanho especificado ({Key.Size}).");
 
-            InitializeStateMatrix(Key.Value);
-            DoRoundKeys();
-        }
-
-        private void InitializeStateMatrix(string key)
-        {
             StateMatrix = new byte[4, 4];
-            for (int column = 0, index = 0; column < 4; column++)
-                for (int line = 0; line < 4; line++, index++)
-                    StateMatrix[line, column] = (byte)key[index];
+            InitializeMatrix(Key.Value, StateMatrix);
             WriteLog("Chave", StateMatrix);
+            DoRoundKeys();
         }
 
         private void DoRoundKeys()
         {
             int qtdColunas = 4;
-            int qtdLinhas = 4 * (10 + 1); // quantidade de rodadas + chave original
+            int qtdLinhas = 4 * (Rounds + 1); // quantidade de rodadas + chave original
 
             this.KeySchedule = new byte[qtdLinhas, qtdColunas];
 
             ApplyRound(0, 0, StateMatrix);
 
-            for (int round = 1; round <= 10; round++)
+            for (int round = 1; round <= Rounds; round++)
             {
                 var currentMatrix = new byte[4, 4];
                 DoFirstColumnRound(ref currentMatrix, round);
@@ -194,7 +204,7 @@ namespace AdvancedEncryptionStandard
         {
             InitializeRound();
 
-            for (int round = 1; round < 10; round++)
+            for (int round = 1; round < Rounds; round++)
                 DoRound(round);
 
             FinalizeRound();
@@ -217,7 +227,7 @@ namespace AdvancedEncryptionStandard
         {
             SubBytes();
             ShiftRows();
-            AddRoundKey(10);
+            AddRoundKey(Rounds);
         }
 
         private void AddRoundKey(int round)
@@ -238,6 +248,27 @@ namespace AdvancedEncryptionStandard
         private void MixClomuns()
         {
 
+        }
+
+        private void InitializeMatrix(string key, byte[,] matrix)
+        {
+            InitializeMatrix(Encoding.ASCII.GetBytes(key), matrix);
+        }
+
+        private void InitializeMatrix(byte[] key, byte[,] matrix)
+        {
+            for (int column = 0, index = 0; column < 4; column++)
+                for (int line = 0; line < 4; line++, index++)
+                    matrix[line, column] = key[index];
+        }
+
+        private byte[] SquareMatrixToArray(byte[,] matrix)
+        {
+            List<byte> array = new List<byte>();
+            for (int line = 0; line < matrix.Length; line++)
+                for (int column = 0; column < 4; column++)
+                    array.Add(matrix[line, column]);
+            return array.ToArray();
         }
 
         public void WriteLog(string step, byte[,] matrix)

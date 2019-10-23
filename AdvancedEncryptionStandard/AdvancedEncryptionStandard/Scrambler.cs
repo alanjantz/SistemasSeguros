@@ -15,7 +15,6 @@ namespace AdvancedEncryptionStandard
         private PaddingMode Padding { get; set; }
         private byte[,] StateMatrix { get; set; }
         private byte[,] KeySchedule { get; set; }
-        private byte[][] RoundConstant { get; set; }
 
         public Scrambler(string originalValue) : this(Encoding.ASCII.GetBytes(originalValue))
         {
@@ -26,21 +25,6 @@ namespace AdvancedEncryptionStandard
             OriginalValue = originalValue;
             OperationMode = CipherMode.ECB;
             Padding = PaddingMode.PKCS7; // Mesmo algoritmo que PKCS#5
-
-            RoundConstant = new byte[11][]
-            {
-                new byte[] { 0x00, 0x00, 0x00, 0x00 },
-                new byte[] { 0x01, 0x00, 0x00, 0x00 },
-                new byte[] { 0x02, 0x00, 0x00, 0x00 },
-                new byte[] { 0x04, 0x00, 0x00, 0x00 },
-                new byte[] { 0x08, 0x00, 0x00, 0x00 },
-                new byte[] { 0x10, 0x00, 0x00, 0x00 },
-                new byte[] { 0x20, 0x00, 0x00, 0x00 },
-                new byte[] { 0x40, 0x00, 0x00, 0x00 },
-                new byte[] { 0x80, 0x00, 0x00, 0x00 },
-                new byte[] { 0x1b, 0x00, 0x00, 0x00 },
-                new byte[] { 0x36, 0x00, 0x00, 0x00 }
-            };
         }
 
         public Scrambler WithKey(string key, int bytes)
@@ -124,7 +108,7 @@ namespace AdvancedEncryptionStandard
             // Passo 3
             ReplaceWord(ref firstColumn);
             // Passo 4
-            byte[] roundConstant = RoundConstant[round];
+            byte[] roundConstant = RoundConstant.Get(round);
             // Passo 5
             for (int column = 0; column < 4; column++)
                 firstColumn[column] = (byte)(firstColumn[column] ^ roundConstant[column]);

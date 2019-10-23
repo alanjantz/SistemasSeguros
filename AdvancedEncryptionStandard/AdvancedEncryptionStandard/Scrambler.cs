@@ -137,7 +137,7 @@ namespace AdvancedEncryptionStandard
             for (int index = 1; index < 4; index++)
                 currentColumn[index - 1] = currentColumn[index];
 
-            currentColumn[3] = first;
+            currentColumn[currentColumn.Length - 1] = first;
         }
 
         private void ReplaceWord(ref byte[] currentColumn)

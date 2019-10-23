@@ -42,6 +42,7 @@ namespace AdvancedEncryptionStandard
             OperationMode = CipherMode.ECB;
             Padding = PaddingMode.PKCS7; // Mesmo algoritmo que PKCS#5
             Rounds = 10;
+            StateMatrixOut = new byte[4, 4];
         }
 
         public Scrambler WithKey(string key, int bytes)
@@ -232,7 +233,10 @@ namespace AdvancedEncryptionStandard
 
         private void AddRoundKey(int round)
         {
-
+            for (int column = 0; column < 4; column++)
+                for (int line = 0; line < 4; line++)
+                    StateMatrixOut[line, column] = (byte)(StateMatrix[line, column]^ StateMatrixIn[line, column]);
+            WriteLog($"AddRoundKey - Round {round}", StateMatrixOut);
         }
 
         private void SubBytes()

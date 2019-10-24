@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColumnMixer.cs" />
     <Compile Include="Exceptions\InvalidKeyException.cs" />
     <Compile Include="Extentions.cs" />
     <Compile Include="Key.cs" />
@@ -49,6 +50,9 @@
     <Compile Include="RoundConstant.cs" />
     <Compile Include="SubstitutionBox.cs" />
     <Compile Include="Scrambler.cs" />
+    <Compile Include="MatrixTable.cs" />
+    <Compile Include="TableE.cs" />
+    <Compile Include="TableL.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -33,6 +33,8 @@ namespace AdvancedEncryptionStandard
         private byte[,] StateMatrixOut { get; set; }
         private int CurrentRound { get; set; }
 
+        private SubstitutionBox SubstitutionBox { get; set; }
+
         public Scrambler(string originalValue) : this(Encoding.ASCII.GetBytes(originalValue))
         {
         }
@@ -44,6 +46,7 @@ namespace AdvancedEncryptionStandard
             Padding = PaddingMode.PKCS7; // Mesmo algoritmo que PKCS#5
             Rounds = 10;
             StateMatrixOut = new byte[4, 4];
+            SubstitutionBox = new SubstitutionBox();
         }
 
         public Scrambler WithKey(string key, int bytes)
@@ -145,54 +148,7 @@ namespace AdvancedEncryptionStandard
         private void ReplaceWord(ref byte[] currentColumn)
         {
             for (int index = 0; index < 4; index++)
-                currentColumn[index] = SubstitutionByte(currentColumn[index]);
-        }
-
-        private byte SubstitutionByte(byte value)
-        {
-            string current = value.ToHexByte();
-
-            if (current.Length != 2)
-                throw new Exception("Erro ao substituir palava: tamanho diferente de 2.");
-
-            int newLine = GetIntValue(current[0].ToString());
-            int newColumn = GetIntValue(current[1].ToString());
-
-            return SubstitutionBox.Get(newLine, newColumn);
-        }
-
-        private int GetIntValue(string value)
-        {
-            value = value.ToUpper();
-
-            switch (value)
-            {
-                case "0":
-                case "1":
-                case "2":
-                case "3":
-                case "4":
-                case "5":
-                case "6":
-                case "7":
-                case "8":
-                case "9":
-                    return Convert.ToInt32(value);
-                case "A":
-                    return 10;
-                case "B":
-                    return 11;
-                case "C":
-                    return 12;
-                case "D":
-                    return 13;
-                case "E":
-                    return 14;
-                case "F":
-                    return 15;
-                default:
-                    throw new Exception("Valor inesperado.");
-            }
+                currentColumn[index] = SubstitutionBox.GetNewByte(currentColumn[index]);
         }
 
         private void ApplyRound(int round, int beggining, byte[,] matrix)
@@ -249,7 +205,7 @@ namespace AdvancedEncryptionStandard
             for (int column = 0; column < 4; column++)
             {
                 for (int line = 0; line < 4; line++)
-                    StateMatrixOut[line, column] = SubstitutionByte(StateMatrixOut[line, column]);
+                    StateMatrixOut[line, column] = SubstitutionBox.GetNewByte(StateMatrixOut[line, column]);
             }
             WriteLog($"SubBytes - Round {CurrentRound}", StateMatrixOut);
         }
@@ -275,6 +231,7 @@ namespace AdvancedEncryptionStandard
 
         private void MixClomuns()
         {
+            StateMatrixOut = ColumnMixer.Mix(StateMatrixOut);
             WriteLog($"MixedColumns - Round {CurrentRound}", StateMatrixOut);
         }
 

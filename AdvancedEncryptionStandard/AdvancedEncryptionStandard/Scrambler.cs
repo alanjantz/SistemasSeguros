@@ -8,8 +8,8 @@ namespace AdvancedEncryptionStandard
 {
     public class Scrambler
     {
-        private byte[] OriginalValue 
-        { 
+        private byte[] OriginalValue
+        {
             get
             {
                 return SquareMatrixToArray(StateMatrixIn);
@@ -31,6 +31,7 @@ namespace AdvancedEncryptionStandard
         private int Rounds { get; set; }
         private byte[,] StateMatrixIn { get; set; }
         private byte[,] StateMatrixOut { get; set; }
+        private int CurrentRound { get; set; }
 
         public Scrambler(string originalValue) : this(Encoding.ASCII.GetBytes(originalValue))
         {
@@ -144,17 +145,20 @@ namespace AdvancedEncryptionStandard
         private void ReplaceWord(ref byte[] currentColumn)
         {
             for (int index = 0; index < 4; index++)
-            {
-                string current = currentColumn[index].ToHexByte();
+                currentColumn[index] = SubstitutionByte(currentColumn[index]);
+        }
 
-                if (current.Length != 2)
-                    throw new Exception("Erro ao substituir palava: tamanho diferente de 2.");
+        private byte SubstitutionByte(byte value)
+        {
+            string current = value.ToHexByte();
 
-                int newLine = GetIntValue(current[0].ToString());
-                int newColumn = GetIntValue(current[1].ToString());
+            if (current.Length != 2)
+                throw new Exception("Erro ao substituir palava: tamanho diferente de 2.");
 
-                currentColumn[index] = SubstitutionBox.Get(newLine, newColumn);
-            }
+            int newLine = GetIntValue(current[0].ToString());
+            int newColumn = GetIntValue(current[1].ToString());
+
+            return SubstitutionBox.Get(newLine, newColumn);
         }
 
         private int GetIntValue(string value)
@@ -205,43 +209,49 @@ namespace AdvancedEncryptionStandard
         {
             InitializeRound();
 
-            for (int round = 1; round < Rounds; round++)
-                DoRound(round);
+            for (CurrentRound = 1; CurrentRound < Rounds; CurrentRound++)
+                DoRound();
 
             FinalizeRound();
         }
 
         private void InitializeRound()
         {
-            AddRoundKey(0);
+            CurrentRound = 0;
+            AddRoundKey();
         }
 
-        private void DoRound(int round)
+        private void DoRound()
         {
             SubBytes();
             ShiftRows();
             MixClomuns();
-            AddRoundKey(round);
+            AddRoundKey();
         }
 
         private void FinalizeRound()
         {
             SubBytes();
             ShiftRows();
-            AddRoundKey(Rounds);
+            AddRoundKey();
         }
 
-        private void AddRoundKey(int round)
+        private void AddRoundKey()
         {
             for (int column = 0; column < 4; column++)
                 for (int line = 0; line < 4; line++)
-                    StateMatrixOut[line, column] = (byte)(StateMatrix[line, column]^ StateMatrixIn[line, column]);
-            WriteLog($"AddRoundKey - Round {round}", StateMatrixOut);
+                    StateMatrixOut[line, column] = (byte)(StateMatrix[line, column] ^ StateMatrixIn[line, column]);
+            WriteLog($"AddRoundKey - Round {CurrentRound}", StateMatrixOut);
         }
 
         private void SubBytes()
         {
-
+            for (int column = 0; column < 4; column++)
+            {
+                for (int line = 0; line < 4; line++)
+                    StateMatrixOut[line, column] = SubstitutionByte(StateMatrixOut[line, column]);
+            }
+            WriteLog($"SubBytes - Round {CurrentRound}", StateMatrixOut);
         }
 
         private void ShiftRows()

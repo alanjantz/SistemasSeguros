@@ -256,12 +256,26 @@ namespace AdvancedEncryptionStandard
 
         private void ShiftRows()
         {
+            byte[] current = null;
+            for (int line = 1; line < 4; line++)
+            {
+                current = new byte[4];
 
+                for (int column = 0; column < 4; column++)
+                    current[column] = StateMatrixOut[line, column];
+
+                for (int turns = 0; turns < line; turns++)
+                    RotateBytes(ref current);
+
+                for (int column = 0; column < 4; column++)
+                    StateMatrixOut[line, column] = current[column];
+            }
+            WriteLog($"ShiftRows - Round {CurrentRound}", StateMatrixOut);
         }
 
         private void MixClomuns()
         {
-
+            WriteLog($"MixedColumns - Round {CurrentRound}", StateMatrixOut);
         }
 
         private void InitializeMatrix(string key, byte[,] matrix)

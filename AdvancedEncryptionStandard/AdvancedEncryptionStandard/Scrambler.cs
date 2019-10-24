@@ -12,7 +12,7 @@ namespace AdvancedEncryptionStandard
         {
             get
             {
-                return SquareMatrixToArray(StateMatrixIn);
+                return StateMatrixIn.ToArray();
             }
             set
             {
@@ -290,38 +290,9 @@ namespace AdvancedEncryptionStandard
                     matrix[line, column] = key[index];
         }
 
-        private byte[] SquareMatrixToArray(byte[,] matrix)
-        {
-            List<byte> array = new List<byte>();
-            for (int line = 0; line < matrix.Length; line++)
-                for (int column = 0; column < 4; column++)
-                    array.Add(matrix[line, column]);
-            return array.ToArray();
-        }
-
         public void WriteLog(string step, byte[,] matrix)
         {
-            Console.WriteLine($"*** {step} ***");
-
-            for (int line = 0; line < 4; line++)
-                Console.WriteLine($"{matrix[line, 0].ToHexByte(true)} {matrix[line, 1].ToHexByte(true)} {matrix[line, 2].ToHexByte(true)} {matrix[line, 3].ToHexByte(true)}");
-
-            Console.WriteLine();
-        }
-    }
-
-    public static class Extentions
-    {
-        public static string ToHexByte(this byte value, bool withPrefix = false)
-        {
-            try
-            {
-                return (withPrefix ? "0x" : string.Empty) + value.ToString("x2");
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            Logger.Write(step, matrix);
         }
     }
 }

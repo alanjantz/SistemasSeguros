@@ -22,10 +22,10 @@
             {
                 for (int line = 0; line < 4; line++)
                 {
-                    result[column, line] = (byte)(GetGalois(matrix[0, column], MultiplicationMatrix[column][0]) ^ // verificar posições
-                                                  GetGalois(matrix[1, column], MultiplicationMatrix[column][1]) ^ // verificar posições
-                                                  GetGalois(matrix[2, column], MultiplicationMatrix[column][2]) ^ // verificar posições
-                                                  GetGalois(matrix[3, column], MultiplicationMatrix[column][3])); // verificar posições
+                    result[line, column] = (byte)(GetGalois(matrix[0, column], MultiplicationMatrix[line][0]) ^
+                                                  GetGalois(matrix[1, column], MultiplicationMatrix[line][1]) ^
+                                                  GetGalois(matrix[2, column], MultiplicationMatrix[line][2]) ^
+                                                  GetGalois(matrix[3, column], MultiplicationMatrix[line][3]));
                 }
             }
 

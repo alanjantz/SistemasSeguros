@@ -12,6 +12,7 @@ namespace AdvancedEncryptionStandard
         {
             get
             {
+                // Realizar o padding
                 return StateMatrixIn.ToArray();
             }
             set
@@ -23,9 +24,6 @@ namespace AdvancedEncryptionStandard
         }
         private byte[] EncryptedValue { get; set; }
         private Key Key { get; set; }
-        private byte[] InitializationVector { get; set; }
-        private CipherMode OperationMode { get; set; }
-        private PaddingMode Padding { get; set; }
         private byte[,] StateMatrix { get; set; }
         private byte[,] KeySchedule { get; set; }
         private int Rounds { get; set; }
@@ -42,8 +40,6 @@ namespace AdvancedEncryptionStandard
         public Scrambler(byte[] originalValue)
         {
             OriginalValue = originalValue;
-            OperationMode = CipherMode.ECB;
-            Padding = PaddingMode.PKCS7; // Mesmo algoritmo que PKCS#5
             Rounds = 10;
             StateMatrixOut = new byte[4, 4];
             SubstitutionBox = new SubstitutionBox();
@@ -51,14 +47,9 @@ namespace AdvancedEncryptionStandard
 
         public Scrambler WithKey(string key, int bytes)
         {
+            // Ajustar para aceitar uma chave ja criptografada, bytes separados por vírgula.
+            // Por exemplo: 20,1,94,33,199,0,48,9,31,94,112,40,59,30,100,248
             this.Key = new Key(key, bytes);
-
-            return this;
-        }
-
-        public Scrambler WithIV(byte[] iv)
-        {
-            this.InitializationVector = iv;
 
             return this;
         }

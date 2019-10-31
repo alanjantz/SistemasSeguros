@@ -16,16 +16,16 @@
 
         public static byte[,] Mix(byte[,] matrix)
         {
-            byte[,] result = matrix;
+            byte[,] result = new byte[4, 4];
 
-            for (int line = 0; line < 4; line++)
+            for (int column = 0; column < 4; column++)
             {
-                for (int column = 0; column < 4; column++)
+                for (int line = 0; line < 4; line++)
                 {
-                    result[line, column] = (byte)(GetGalois(matrix[0, line], MultiplicationMatrix[line][0]) ^ // verificar posições
-                                                  GetGalois(matrix[1, line], MultiplicationMatrix[line][1]) ^ // verificar posições
-                                                  GetGalois(matrix[2, line], MultiplicationMatrix[line][2]) ^ // verificar posições
-                                                  GetGalois(matrix[3, line], MultiplicationMatrix[line][3])); // verificar posições
+                    result[column, line] = (byte)(GetGalois(matrix[0, column], MultiplicationMatrix[column][0]) ^ // verificar posições
+                                                  GetGalois(matrix[1, column], MultiplicationMatrix[column][1]) ^ // verificar posições
+                                                  GetGalois(matrix[2, column], MultiplicationMatrix[column][2]) ^ // verificar posições
+                                                  GetGalois(matrix[3, column], MultiplicationMatrix[column][3])); // verificar posições
                 }
             }
 

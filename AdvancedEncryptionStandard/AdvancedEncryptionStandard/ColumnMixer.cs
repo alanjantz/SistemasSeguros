@@ -34,23 +34,21 @@
 
         private static byte GetGalois(byte first, byte second)
         {
+            if (first == 0 || second == 0)
+                return 0;
+            else if (first == 1)
+                return (byte)second;
+            else if (second == 1)
+                return (byte)first;
+
             first = TableL.GetNewByte(first);
             second = TableL.GetNewByte(second);
 
             byte result = (byte)((first + second) % 0xFF);
 
             result = TableE.GetNewByte(result);
-
-            MatrixTable.GetNewPositions(out int firstTerm, out int secondTerm, result.ToHexByte());
-
-            if (firstTerm == 0 || secondTerm == 0)
-                return 0;
-            else if (firstTerm == 1)
-                return (byte)secondTerm;
-            else if (secondTerm == 1)
-                return (byte)firstTerm;
-            else
-                return result;
+            
+            return result;
         }
     }
 }

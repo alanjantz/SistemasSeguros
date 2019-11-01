@@ -23,7 +23,7 @@ namespace AdvancedEncryptionStandard
         public static byte[] ToArray(this byte[,] matrix)
         {
             List<byte> array = new List<byte>();
-            for (int line = 0; line < matrix.Length; line++)
+            for (int line = 0; line < matrix.Length / 4; line++)
                 for (int column = 0; column < 4; column++)
                     array.Add(matrix[line, column]);
             return array.ToArray();

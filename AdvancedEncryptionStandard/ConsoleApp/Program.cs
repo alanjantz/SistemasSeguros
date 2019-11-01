@@ -1,5 +1,6 @@
 ﻿using AdvancedEncryptionStandard;
 using System;
+using System.Text;
 
 namespace ConsoleApp
 {
@@ -9,7 +10,11 @@ namespace ConsoleApp
         {
             var scrambler = new Scrambler("DESENVOLVIMENTO!").WithKey("ABCDEFGHIJKLMNOP", 4);
 
-            scrambler.Encrypt();
+            var result = scrambler.Encrypt();
+            Console.WriteLine();
+
+            Console.WriteLine(Encoding.Default.GetString(result));
+
             Console.ReadLine();
         }
     }

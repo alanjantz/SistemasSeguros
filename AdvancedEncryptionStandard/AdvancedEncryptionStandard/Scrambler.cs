@@ -22,7 +22,13 @@ namespace AdvancedEncryptionStandard
                 WriteLog("Texto simples", StateMatrixIn);
             }
         }
-        private byte[] EncryptedValue { get; set; }
+        private byte[] EncryptedValue 
+        {
+            get
+            {
+                return StateMatrixOut.ToArray();
+            }
+        }
         private Key Key { get; set; }
         private byte[,] StateMatrix { get; set; }
         private byte[,] KeySchedule { get; set; }

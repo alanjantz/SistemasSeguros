@@ -12,11 +12,11 @@ namespace AdvancedEncryptionStandard
         {
             get
             {
-                // Realizar o padding
                 return StateMatrixIn.ToArray();
             }
             set
             {
+                // Realizar o padding
                 StateMatrixIn = new byte[value.Length / 4, 4];
                 InitializeMatrix(value, StateMatrixIn);
                 WriteLog("Texto simples", StateMatrixIn);
@@ -165,7 +165,8 @@ namespace AdvancedEncryptionStandard
         private void InitializeRound()
         {
             CurrentRound = 0;
-            AddRoundKey();
+            byte[,] roundKey = GetRoundKeyTable(CurrentRound);
+            AddRoundKey(StateMatrixIn, roundKey);
         }
 
         private void DoRound()
@@ -173,21 +174,23 @@ namespace AdvancedEncryptionStandard
             SubBytes();
             ShiftRows();
             MixClomuns();
-            AddRoundKey();
+            byte[,] roundKey = GetRoundKeyTable(CurrentRound);
+            AddRoundKey(StateMatrixOut, roundKey);
         }
 
         private void FinalizeRound()
         {
             SubBytes();
             ShiftRows();
-            AddRoundKey();
+            byte[,] roundKey = GetRoundKeyTable(CurrentRound);
+            AddRoundKey(StateMatrixOut, roundKey);
         }
 
-        private void AddRoundKey()
+        private void AddRoundKey(byte[,] first, byte[,] second)
         {
             for (int column = 0; column < 4; column++)
                 for (int line = 0; line < 4; line++)
-                    StateMatrixOut[line, column] = (byte)(StateMatrix[line, column] ^ StateMatrixIn[line, column]);
+                    StateMatrixOut[line, column] = (byte)(first[line, column] ^ second[line, column]);
             WriteLog($"AddRoundKey - Round {CurrentRound}", StateMatrixOut);
         }
 
@@ -236,6 +239,19 @@ namespace AdvancedEncryptionStandard
             for (int column = 0, index = 0; column < 4; column++)
                 for (int line = 0; line < 4; line++, index++)
                     matrix[line, column] = key[index];
+        }
+
+        private byte[,] GetRoundKeyTable(int round)
+        {
+            var result = new byte[4, 4];
+
+            int lineStart = 4 * round;
+
+            for (int column = 0; column < 4; column++)
+                for (int line = lineStart; line < lineStart + 4; line++)
+                    result[line % 4, column] = KeySchedule[line, column];
+
+            return result;
         }
 
         public void WriteLog(string step, byte[,] matrix)

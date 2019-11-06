@@ -16,16 +16,17 @@
 
         public static byte[,] Mix(byte[,] matrix)
         {
-            byte[,] result = new byte[4, 4];
+            int qtdLinhas = matrix.Length / 4;
+            byte[,] result = new byte[qtdLinhas, 4];
 
             for (int column = 0; column < 4; column++)
             {
-                for (int line = 0; line < 4; line++)
+                for (int line = 0; line < qtdLinhas; line++)
                 {
-                    result[line, column] = (byte)(GetGalois(matrix[0, column], MultiplicationMatrix[line][0]) ^
-                                                  GetGalois(matrix[1, column], MultiplicationMatrix[line][1]) ^
-                                                  GetGalois(matrix[2, column], MultiplicationMatrix[line][2]) ^
-                                                  GetGalois(matrix[3, column], MultiplicationMatrix[line][3]));
+                    result[line, column] = (byte)(GetGalois(matrix[0, column], MultiplicationMatrix[line % 4][0]) ^
+                                                  GetGalois(matrix[1, column], MultiplicationMatrix[line % 4][1]) ^
+                                                  GetGalois(matrix[2, column], MultiplicationMatrix[line % 4][2]) ^
+                                                  GetGalois(matrix[3, column], MultiplicationMatrix[line % 4][3]));
                 }
             }
 

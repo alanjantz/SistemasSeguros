@@ -11,6 +11,7 @@ namespace AdvancedEncryptionStandard
         public byte[] Value { get; private set; }
         public int Size { get; private set; }
         public int Bits { get; private set; }
+        public int BlockSize => Bits / 8;
 
         public Key(string value, int size)
         {
@@ -31,7 +32,7 @@ namespace AdvancedEncryptionStandard
                     break;
             }
 
-            if (this.Value.Length != this.Bits / 8)
+            if (this.Value.Length != BlockSize)
                 throw new InvalidKeyException($"A chave \"{value}\" não condiz com o tamanho especificado ({size}).");
         }
 

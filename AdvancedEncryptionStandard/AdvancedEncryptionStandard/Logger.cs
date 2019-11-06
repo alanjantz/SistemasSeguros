@@ -12,7 +12,7 @@ namespace AdvancedEncryptionStandard
         {
             Console.WriteLine($"*** {step} ***");
 
-            for (int line = 0; line < 4; line++)
+            for (int line = 0; line < matrix.Length / 4; line++)
                 Console.WriteLine($"{matrix[line, 0].ToHexByte(true)} {matrix[line, 1].ToHexByte(true)} {matrix[line, 2].ToHexByte(true)} {matrix[line, 3].ToHexByte(true)}");
 
             Console.WriteLine();

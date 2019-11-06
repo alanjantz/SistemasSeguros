@@ -8,7 +8,7 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            var result = new Scrambler().WithKey("ABCDEFGHIJKLMNOP", 4).Encrypt("DESENVOLVIMENTO!");
+            var result = new Scrambler().WithKey("ABCDEFGHIJKLMNOP", 4).Encrypt("DESENVOLVIMENTO!A");
 
             Console.ReadLine();
         }

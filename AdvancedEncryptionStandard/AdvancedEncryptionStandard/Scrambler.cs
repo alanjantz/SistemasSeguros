@@ -264,9 +264,9 @@ namespace AdvancedEncryptionStandard
 
         private void InitializeMatrix(byte[] key, byte[,] matrix)
         {
-            for (int round = 0, index = 0; round < matrix.Length / Key.BlockSize; round++)
+            for (int block = 0, index = 0; block < matrix.Length / Key.BlockSize; block++)
             {
-                int beggining = round * 4;
+                int beggining = block * 4;
                 for (int column = 0; column < 4; column++)
                     for (int line = beggining; line < beggining + 4; line++, index++)
                         matrix[line, column] = key[index];

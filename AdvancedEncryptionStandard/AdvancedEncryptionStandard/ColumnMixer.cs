@@ -19,14 +19,18 @@
             int qtdLinhas = matrix.Length / 4;
             byte[,] result = new byte[qtdLinhas, 4];
 
-            for (int column = 0; column < 4; column++)
+            for (int block = 0; block < qtdLinhas / 4; block++)
             {
-                for (int line = 0; line < qtdLinhas; line++)
+                int beggining = block * 4;
+                for (int column = 0; column < 4; column++)
                 {
-                    result[line, column] = (byte)(GetGalois(matrix[0, column], MultiplicationMatrix[line % 4][0]) ^
-                                                  GetGalois(matrix[1, column], MultiplicationMatrix[line % 4][1]) ^
-                                                  GetGalois(matrix[2, column], MultiplicationMatrix[line % 4][2]) ^
-                                                  GetGalois(matrix[3, column], MultiplicationMatrix[line % 4][3]));
+                    for (int line = beggining; line < beggining + 4; line++)
+                    {
+                        result[line, column] = (byte)(GetGalois(matrix[beggining + 0, column], MultiplicationMatrix[line % 4][0]) ^
+                                                      GetGalois(matrix[beggining + 1, column], MultiplicationMatrix[line % 4][1]) ^
+                                                      GetGalois(matrix[beggining + 2, column], MultiplicationMatrix[line % 4][2]) ^
+                                                      GetGalois(matrix[beggining + 3, column], MultiplicationMatrix[line % 4][3]));
+                    }
                 }
             }
 
@@ -48,7 +52,7 @@
             byte result = (byte)((first + second) % 0xFF);
 
             result = TableE.GetNewByte(result);
-            
+
             return result;
         }
     }

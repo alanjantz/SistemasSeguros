@@ -53,8 +53,6 @@ namespace AdvancedEncryptionStandard
 
         public Scrambler WithKey(string key, int bytes)
         {
-            // Ajustar para aceitar uma chave ja criptografada, bytes separados por vírgula.
-            // Por exemplo: 20,1,94,33,199,0,48,9,31,94,112,40,59,30,100,248
             this.Key = new Key(key, bytes);
 
             return this;
@@ -71,9 +69,6 @@ namespace AdvancedEncryptionStandard
         #region ExpandKeys
         private void ExpandKey()
         {
-            if (Key.Value.Length != Key.Bits / 8)
-                throw new InvalidKeyException($"A chave \"{Key}\" não condiz com o tamanho especificado ({Key.Size}).");
-
             StateMatrix = new byte[4, 4];
             InitializeMatrix(Key.Value, StateMatrix);
             WriteLog("Chave", StateMatrix);

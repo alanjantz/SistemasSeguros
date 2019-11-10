@@ -246,13 +246,10 @@ namespace AdvancedEncryptionStandard
             if (extraValues > 0)
             {
                 int diff = blockSize - extraValues;
-
                 newValue.AddRange(Enumerable.Repeat((byte)diff, diff));
             }
             else
-            {
-                // Adicionar bloco com padding a mais?
-            }
+                newValue.AddRange(Enumerable.Repeat((byte)Key.BlockSize, Key.BlockSize));
 
             return newValue.ToArray();
         }

@@ -14,18 +14,26 @@ namespace AdvancedEncryptionStandard
             {
                 return (withPrefix ? "0x" : string.Empty) + value.ToString("x2");
             }
-            catch (Exception)
+            catch
             {
-                throw;
+                return string.Empty;
             }
         }
 
         public static byte[] ToArray(this byte[,] matrix)
         {
             List<byte> array = new List<byte>();
-            for (int line = 0; line < matrix.Length / 4; line++)
+            int qtdLinhas = matrix.Length / 4;
+
+            for (int block = 0; block < qtdLinhas / 4; block++)
+            {
+                int beggining = block * 4;
+
                 for (int column = 0; column < 4; column++)
-                    array.Add(matrix[line, column]);
+                    for (int line = beggining; line < beggining + 4; line++)
+                        array.Add(matrix[line, column]);
+            }
+
             return array.ToArray();
         }
 

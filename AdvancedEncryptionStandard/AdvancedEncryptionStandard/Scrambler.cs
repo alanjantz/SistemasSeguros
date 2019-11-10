@@ -1,8 +1,5 @@
-﻿using AdvancedEncryptionStandard.Exceptions;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace AdvancedEncryptionStandard
@@ -87,7 +84,7 @@ namespace AdvancedEncryptionStandard
 
             this.KeySchedule = new byte[qtdLinhas, qtdColunas];
 
-            ApplyRound(0, 0, StateMatrix, false);
+            ApplyRound(0, 0, StateMatrix);
 
             for (int round = 1; round <= Rounds; round++)
             {
@@ -99,7 +96,7 @@ namespace AdvancedEncryptionStandard
                     for (int line = 0; line < 4; line++)
                         currentMatrix[line, column] = (byte)(this.KeySchedule[line + ((round - 1) * 4), column] ^ currentMatrix[line, column - 1]);
                 }
-                ApplyRound(round, 4 * round, currentMatrix, false);
+                ApplyRound(round, 4 * round, currentMatrix);
             }
         }
 

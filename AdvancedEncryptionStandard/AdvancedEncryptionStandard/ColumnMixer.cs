@@ -14,22 +14,22 @@
                 new byte[] { 3, 1, 1, 2 }
             };
 
-        public static byte[,] Mix(byte[,] matrix)
+        public static byte[,] Mix(byte[,] matrix, Key key)
         {
-            int qtdLinhas = matrix.Length / 4;
-            byte[,] result = new byte[qtdLinhas, 4];
+            int qtdLinhas = matrix.Length / key.Size;
+            byte[,] result = new byte[qtdLinhas, key.Size];
 
-            for (int block = 0; block < qtdLinhas / 4; block++)
+            for (int block = 0; block < qtdLinhas / key.Size; block++)
             {
-                int beggining = block * 4;
-                for (int column = 0; column < 4; column++)
+                int beggining = block * key.Size;
+                for (int column = 0; column < key.Size; column++)
                 {
-                    for (int line = beggining; line < beggining + 4; line++)
+                    for (int line = beggining; line < beggining + key.Size; line++)
                     {
-                        result[line, column] = (byte)(GetGalois(matrix[beggining + 0, column], MultiplicationMatrix[line % 4][0]) ^
-                                                      GetGalois(matrix[beggining + 1, column], MultiplicationMatrix[line % 4][1]) ^
-                                                      GetGalois(matrix[beggining + 2, column], MultiplicationMatrix[line % 4][2]) ^
-                                                      GetGalois(matrix[beggining + 3, column], MultiplicationMatrix[line % 4][3]));
+                        result[line, column] = (byte)(GetGalois(matrix[beggining + 0, column], MultiplicationMatrix[line % key.Size][0]) ^
+                                                      GetGalois(matrix[beggining + 1, column], MultiplicationMatrix[line % key.Size][1]) ^
+                                                      GetGalois(matrix[beggining + 2, column], MultiplicationMatrix[line % key.Size][2]) ^
+                                                      GetGalois(matrix[beggining + 3, column], MultiplicationMatrix[line % key.Size][3]));
                     }
                 }
             }

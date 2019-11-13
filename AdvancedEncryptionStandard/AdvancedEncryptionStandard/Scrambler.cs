@@ -15,14 +15,13 @@ namespace AdvancedEncryptionStandard
             set
             {
                 value = AddPadding(value);
-                int qtdLinhas = value.Length / 4;
-                StateMatrixIn = new byte[qtdLinhas, 4];
-                StateMatrixOut = new byte[qtdLinhas, 4];
+                int qtdLinhas = value.Length / Key.Size;
+                StateMatrixIn = new byte[qtdLinhas, Key.Size];
+                StateMatrixOut = new byte[qtdLinhas, Key.Size];
                 InitializeMatrix(value, StateMatrixIn);
                 WriteLog("Texto simples", StateMatrixIn);
             }
         }
-
         private byte[] EncryptedValue
         {
             get
@@ -71,7 +70,7 @@ namespace AdvancedEncryptionStandard
         #region ExpandKeys
         private void ExpandKey()
         {
-            StateMatrix = new byte[4, 4];
+            StateMatrix = new byte[Key.Size, Key.Size];
             InitializeMatrix(Key.Value, StateMatrix);
             WriteLog("Chave", StateMatrix);
             DoRoundKeys();
@@ -79,8 +78,8 @@ namespace AdvancedEncryptionStandard
 
         private void DoRoundKeys()
         {
-            int qtdColunas = 4;
-            int qtdLinhas = 4 * (Rounds + 1); // quantidade de rodadas + chave original
+            int qtdColunas = Key.Size;
+            int qtdLinhas = Key.Size * (Rounds + 1); // quantidade de rodadas + chave original
 
             this.KeySchedule = new byte[qtdLinhas, qtdColunas];
 
@@ -88,26 +87,26 @@ namespace AdvancedEncryptionStandard
 
             for (int round = 1; round <= Rounds; round++)
             {
-                var currentMatrix = new byte[4, 4];
+                var currentMatrix = new byte[Key.Size, Key.Size];
                 DoFirstColumnRound(ref currentMatrix, round);
 
-                for (int column = 1; column < 4; column++)
+                for (int column = 1; column < Key.Size; column++)
                 {
-                    for (int line = 0; line < 4; line++)
-                        currentMatrix[line, column] = (byte)(this.KeySchedule[line + ((round - 1) * 4), column] ^ currentMatrix[line, column - 1]);
+                    for (int line = 0; line < Key.Size; line++)
+                        currentMatrix[line, column] = (byte)(this.KeySchedule[line + ((round - 1) * Key.Size), column] ^ currentMatrix[line, column - 1]);
                 }
-                ApplyRound(round, 4 * round, currentMatrix);
+                ApplyRound(round, Key.Size * round, currentMatrix);
             }
         }
 
         private void DoFirstColumnRound(ref byte[,] currentMatrix, int round)
         {
-            int lineIndex = round * 4;
-            byte[] firstColumn = new byte[4];
-            byte[] lastRoundKey = new byte[4];
+            int lineIndex = round * Key.Size;
+            byte[] firstColumn = new byte[Key.Size];
+            byte[] lastRoundKey = new byte[Key.Size];
 
             // Passo 1
-            for (int index = lineIndex - 4, maximum = index + 4, column = 0; index < maximum; index++, column++)
+            for (int index = lineIndex - Key.Size, maximum = index + Key.Size, column = 0; index < maximum; index++, column++)
             {
                 firstColumn[column] = this.KeySchedule[index, 3];
                 lastRoundKey[column] = this.KeySchedule[index, 0]; // utilizado no passo 6
@@ -119,13 +118,13 @@ namespace AdvancedEncryptionStandard
             // Passo 4
             byte[] roundConstant = RoundConstant.Get(round);
             // Passo 5
-            for (int column = 0; column < 4; column++)
+            for (int column = 0; column < Key.Size; column++)
                 firstColumn[column] = (byte)(firstColumn[column] ^ roundConstant[column]);
             // Passo 6
-            for (int column = 0; column < 4; column++)
+            for (int column = 0; column < Key.Size; column++)
                 firstColumn[column] = (byte)(firstColumn[column] ^ lastRoundKey[column]);
 
-            for (int line = 0; line < 4; line++)
+            for (int line = 0; line < Key.Size; line++)
                 currentMatrix[line, 0] = firstColumn[line];
         }
 
@@ -133,7 +132,7 @@ namespace AdvancedEncryptionStandard
         {
             byte first = currentColumn[0];
 
-            for (int index = 1; index < 4; index++)
+            for (int index = 1; index < Key.Size; index++)
                 currentColumn[index - 1] = currentColumn[index];
 
             currentColumn[currentColumn.Length - 1] = first;
@@ -141,15 +140,15 @@ namespace AdvancedEncryptionStandard
 
         private void ReplaceWord(ref byte[] currentColumn)
         {
-            for (int index = 0; index < 4; index++)
+            for (int index = 0; index < Key.Size; index++)
                 currentColumn[index] = SubstitutionBox.GetNewByte(currentColumn[index]);
         }
 
         private void ApplyRound(int round, int beggining, byte[,] matrix, bool writeLog = true)
         {
-            for (int line = beggining, index = 0; line < beggining + 4; line++, index++)
-                for (int column = 0; column < 4; column++)
-                    this.KeySchedule[line, column] = matrix[index, column];
+            for (int line = beggining; line < beggining + Key.Size; line++)
+                for (int column = 0; column < Key.Size; column++)
+                    this.KeySchedule[line, column] = matrix[line % Key.Size, column];
 
             if (writeLog)
                 WriteLog($"Round {round}", matrix);
@@ -192,17 +191,17 @@ namespace AdvancedEncryptionStandard
 
         private void AddRoundKey(byte[,] matrix, byte[,] roundKey)
         {
-            for (int column = 0; column < 4; column++)
-                for (int line = 0; line < matrix.Length / 4; line++)
-                    StateMatrixOut[line, column] = (byte)(matrix[line, column] ^ roundKey[line % 4, column]);
+            for (int column = 0; column < Key.Size; column++)
+                for (int line = 0; line < matrix.Length / Key.Size; line++)
+                    StateMatrixOut[line, column] = (byte)(matrix[line, column] ^ roundKey[line % Key.Size, column]);
             WriteLog($"AddRoundKey - Round {CurrentRound}", StateMatrixOut);
         }
 
         private void SubBytes()
         {
-            for (int column = 0; column < 4; column++)
+            for (int column = 0; column < Key.Size; column++)
             {
-                for (int line = 0; line < StateMatrixOut.Length / 4; line++)
+                for (int line = 0; line < StateMatrixOut.Length / Key.Size; line++)
                     StateMatrixOut[line, column] = SubstitutionBox.GetNewByte(StateMatrixOut[line, column]);
             }
             WriteLog($"SubBytes - Round {CurrentRound}", StateMatrixOut);
@@ -211,17 +210,17 @@ namespace AdvancedEncryptionStandard
         private void ShiftRows()
         {
             byte[] current = null;
-            for (int line = 1; line < StateMatrixOut.Length / 4; line++)
+            for (int line = 1; line < StateMatrixOut.Length / Key.Size; line++)
             {
-                current = new byte[4];
+                current = new byte[Key.Size];
 
-                for (int column = 0; column < 4; column++)
+                for (int column = 0; column < Key.Size; column++)
                     current[column] = StateMatrixOut[line, column];
 
-                for (int turns = 0; turns < line % 4; turns++)
+                for (int turns = 0; turns < line % Key.Size; turns++)
                     RotateBytes(ref current);
 
-                for (int column = 0; column < 4; column++)
+                for (int column = 0; column < Key.Size; column++)
                     StateMatrixOut[line, column] = current[column];
             }
             WriteLog($"ShiftRows - Round {CurrentRound}", StateMatrixOut);
@@ -229,7 +228,7 @@ namespace AdvancedEncryptionStandard
 
         private void MixClomuns()
         {
-            StateMatrixOut = ColumnMixer.Mix(StateMatrixOut);
+            StateMatrixOut = ColumnMixer.Mix(StateMatrixOut, Key);
             WriteLog($"MixedColumns - Round {CurrentRound}", StateMatrixOut);
         }
 
@@ -260,22 +259,22 @@ namespace AdvancedEncryptionStandard
         {
             for (int block = 0, index = 0; block < matrix.Length / Key.BlockSize; block++)
             {
-                int beggining = block * 4;
-                for (int column = 0; column < 4; column++)
-                    for (int line = beggining; line < beggining + 4; line++, index++)
+                int beggining = block * Key.Size;
+                for (int column = 0; column < Key.Size; column++)
+                    for (int line = beggining; line < beggining + Key.Size; line++, index++)
                         matrix[line, column] = key[index];
             }
         }
 
         private byte[,] GetRoundKeyTable(int round)
         {
-            var result = new byte[4, 4];
+            var result = new byte[Key.Size, Key.Size];
 
-            int lineStart = 4 * round;
+            int lineStart = Key.Size * round;
 
-            for (int column = 0; column < 4; column++)
-                for (int line = lineStart; line < lineStart + 4; line++)
-                    result[line % 4, column] = KeySchedule[line, column];
+            for (int column = 0; column < Key.Size; column++)
+                for (int line = lineStart; line < lineStart + Key.Size; line++)
+                    result[line % Key.Size, column] = KeySchedule[line, column];
 
             return result;
         }

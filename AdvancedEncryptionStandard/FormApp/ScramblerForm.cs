@@ -60,10 +60,19 @@ namespace FormApp
         {
             try
             {
+                Console.WriteLine("Início. " + DateTime.Now);
+                FileStream ostrm = new FileStream($"./Logger-{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.txt", FileMode.OpenOrCreate, FileAccess.Write);
+                StreamWriter writer = new StreamWriter(ostrm);
+                TextWriter oldOut = Console.Out;
+                Console.SetOut(writer);
                 var result = new Scrambler().WithKey(txtKey.Text, 4).Encrypt(FileValue);
                 Console.WriteLine(string.Join(string.Empty, result.Select(b => b.ToHexByte())).ToUpper());
                 File.WriteAllBytes(txtEncryptedFile.Text, result);
                 Console.WriteLine();
+                Console.SetOut(oldOut);
+                writer.Close();
+                ostrm.Close();
+                Console.WriteLine("Concluído. " + DateTime.Now);
             }
             catch (Exception ex)
             {

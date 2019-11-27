@@ -58,12 +58,12 @@ namespace FormApp
 
         private void btnEncrypt_Click(object sender, EventArgs e)
         {
+            TextWriter oldOut = Console.Out;
             try
             {
                 Console.WriteLine("Início. " + DateTime.Now);
                 FileStream ostrm = new FileStream($"./Logger-{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.txt", FileMode.OpenOrCreate, FileAccess.Write);
                 StreamWriter writer = new StreamWriter(ostrm);
-                TextWriter oldOut = Console.Out;
                 Console.SetOut(writer);
                 var result = new Scrambler().WithKey(txtKey.Text, 4).Encrypt(FileValue);
                 Console.WriteLine(string.Join(string.Empty, result.Select(b => b.ToHexByte())).ToUpper());
@@ -76,6 +76,7 @@ namespace FormApp
             }
             catch (Exception ex)
             {
+                Console.SetOut(oldOut);
                 Console.WriteLine("ERRO!");
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(new string('*', 10));

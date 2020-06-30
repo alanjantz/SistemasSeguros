@@ -65,7 +65,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     nokogiri (1.10.5-x86-mingw32)
       mini_portile2 (~> 2.4.0)
-    puma (3.12.1)
+    puma (3.12.6)
     rack (2.2.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -140,7 +140,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   mysql2 (>= 0.3.18, < 0.6.0)
-  puma (~> 3.7)
+  puma (~> 3.12)
   rails (~> 5.1.7)
   rspec-rails (~> 3.6)
   simple_command
